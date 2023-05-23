@@ -8,13 +8,17 @@ public class OpponentController : MonoBehaviour
     public float maxHealth = 100f; // Maximum health of the opponent
     public float currentHealth = 100f; // Current health of the opponent
 
+    //public Slider hpBarPrefab;
     public Slider hpBar; // Reference to the HP bar UI Slider
+    //private RectTransform hpBarRectTransform; // Reference to the HP bar's RectTransform
 
-    public RectTransform hpBarRectTransform; // Reference to the HP bar's RectTransform
+    public float maxRenderDistance = 20f; // Maximum distance at which the HP bar is rendered
+
 
     private void Start()
     {
-        OpponentController opponent = new OpponentController();
+        //hpBar = Instantiate(hpBarPrefab);
+        //hpBarRectTransform = hpBar.GetComponent<RectTransform>();
         UpdateHPBar();
     }
 
@@ -23,7 +27,21 @@ public class OpponentController : MonoBehaviour
     {
 
         Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
-        hpBarRectTransform.position = screenPos + new Vector3(0f, 100f, 0f);
+        Vector3 hpBarPos = screenPos + new Vector3(0f, 100f, 0f);
+
+        // Calculate distance between the opponent and the player
+        float distance = Vector3.Distance(transform.position, Camera.main.transform.position);
+
+        if (distance < maxRenderDistance)
+        {
+            // Opponent is within the rendering distance, show the HP bar
+            hpBar.transform.position = hpBarPos;
+        }
+        else
+        {
+            // Opponent is beyond the rendering distance, disable HP bar rendering
+            hpBar.transform.position = new Vector3(-1000f, -1000f, 0f);
+        }
     }
 
     // Call this method to update the HP bar

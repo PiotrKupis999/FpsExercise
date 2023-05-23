@@ -4,22 +4,25 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-
+    
 
     public float movementSpeed = 5f;
     public float mouseSensitivity = 2f;
-    public float gravity;
+    private float gravity = 1000f;
 
     private CharacterController characterController;
     private Camera playerCamera;
     private float verticalRotation = 0f;
     private Vector3 moveDirection;
     private Ray ray;
+    public ParticleController particleController;
+
 
     void Start()
     {
         characterController = GetComponent<CharacterController>();
         playerCamera = GetComponentInChildren<Camera>();
+        particleController = GetComponent<ParticleController>();
 
 
         Cursor.lockState = CursorLockMode.Locked;
@@ -30,6 +33,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+
         // Player movement
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
@@ -54,29 +58,8 @@ public class PlayerController : MonoBehaviour
 
         // Move the ray
         ray.origin = transform.position;
-        // Rotate the ray
         Quaternion rotation = Quaternion.Euler(-mouseY, mouseX, 0f);
         ray.direction = rotation * playerCamera.transform.forward;
-
-        /*
-
-        // Perform raycast
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))
-        {
-            Debug.DrawRay(ray.origin, ray.direction * hit.distance, Color.red);
-
-            Debug.Log("Hit object: " + hit.collider.gameObject.name);
-            Debug.Log("Hit point: " + hit.point);
-        }
-        else
-        {
-            Debug.DrawRay(ray.origin, ray.direction, Color.green);
-            Debug.Log("nth");
-
-        }
-        */
-
 
 
         // Shooting
@@ -84,20 +67,58 @@ public class PlayerController : MonoBehaviour
         {
             Shoot();
         }
+
+        
+
     }
 
     void Shoot()
     {
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit) && (hit.collider.gameObject.tag == "soft"))
+
+
+
+
+        switch (GunsController.currentGun)
         {
-            OpponentController opponent = hit.collider.gameObject.GetComponent<OpponentController>();
-            if (opponent != null)
-            {
-                opponent.Hit();
-            }
+            case GunsController.Guns.Pistol:
+                if (Physics.Raycast(ray, out hit) && (hit.collider.gameObject.tag == "soft"))
+                {
+                    OpponentController opponent = hit.collider.gameObject.GetComponent<OpponentController>();
+                    if (opponent != null)
+                    {
+                        opponent.Hit();
+                        //particleController.StartParticleSystem(hit.point);
+
+                    }
+                }
+                break;
+            case GunsController.Guns.PM:
+                if (Physics.Raycast(ray, out hit) && (hit.collider.gameObject.tag == "medium"))
+                {
+                    OpponentController opponent = hit.collider.gameObject.GetComponent<OpponentController>();
+                    if (opponent != null)
+                    {
+                        opponent.Hit();
+                    }
+                }
+                break;
+            case GunsController.Guns.M4:
+                if (Physics.Raycast(ray, out hit) && (hit.collider.gameObject.tag == "hard"))
+                {
+                    OpponentController opponent = hit.collider.gameObject.GetComponent<OpponentController>();
+                    if (opponent != null)
+                    {
+                        opponent.Hit();
+                    }
+                }
+                break;
+
+
         }
+
+
         Debug.Log("Shoot!");
     }
 }
