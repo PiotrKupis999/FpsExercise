@@ -13,27 +13,41 @@ public class GunsController : MonoBehaviour
 
     public static Guns currentGun = Guns.Pistol;
 
+    public static float pistolDamage = 20f;
+    public static float pmDamage = 30f;
+    public static float m4Damage = 60f; 
+
+
     public GameObject pistolImage;
     public GameObject pmImage;
     public GameObject m4Image;
 
-    // Start is called before the first frame update
+    //weapons selection table
+    public GameObject pistolMiniImage;
+    public GameObject pmMiniImage;
+    public GameObject m4MiniImage;
+
     void Start()
     {
         pmImage.SetActive(false);
         m4Image.SetActive(false);
+        pmMiniImage.SetActive(false);
+        m4MiniImage.SetActive(false);
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             if (currentGun == Guns.Pistol) { return; }
-            Debug.Log("change");
+
             pistolImage.SetActive(true);
             pmImage.SetActive(false);
             m4Image.SetActive(false);
+
+            pistolMiniImage.SetActive(true);
+            pmMiniImage.SetActive(false);
+            m4MiniImage.SetActive(false);
 
             currentGun = Guns.Pistol;
         }
@@ -45,6 +59,10 @@ public class GunsController : MonoBehaviour
             pmImage.SetActive(true);
             m4Image.SetActive(false);
 
+            pistolMiniImage.SetActive(false);
+            pmMiniImage.SetActive(true);
+            m4MiniImage.SetActive(false);
+
             currentGun = Guns.PM;
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
@@ -55,13 +73,13 @@ public class GunsController : MonoBehaviour
             pmImage.SetActive(false);
             m4Image.SetActive(true);
 
+            pistolMiniImage.SetActive(false);
+            pmMiniImage.SetActive(false);
+            m4MiniImage.SetActive(true);
+
             currentGun = Guns.M4;
         }
 
     }
 
-    public void WeaponChange()
-    {
-
-    }
 }

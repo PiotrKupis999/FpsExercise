@@ -3,64 +3,86 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class OpponentController : MonoBehaviour
 {
-    public float maxHealth = 100f; // Maximum health of the opponent
-    public float currentHealth = 100f; // Current health of the opponent
+    private List<IDestroyable> observers = new List<IDestroyable>();
 
-    //public Slider hpBarPrefab;
-    public Slider hpBar; // Reference to the HP bar UI Slider
-    //private RectTransform hpBarRectTransform; // Reference to the HP bar's RectTransform
+    public float softHealth; 
+    public float mediumHealth; 
+    public float hardHealth; 
 
-    public float maxRenderDistance = 20f; // Maximum distance at which the HP bar is rendered
+    private float currentHealth; 
+    private float maxHealth; 
+
+    private Slider hpBar;
 
 
     private void Start()
     {
-        //hpBar = Instantiate(hpBarPrefab);
-        //hpBarRectTransform = hpBar.GetComponent<RectTransform>();
+        hpBar = GetComponentInChildren<Slider>();
+
+        switch (tag)
+        {
+            case "soft":
+                currentHealth = softHealth;
+                maxHealth = softHealth;
+                break;
+            case "medium":
+                currentHealth = mediumHealth;
+                maxHealth = mediumHealth;
+                break;
+            case "hard":
+                currentHealth = hardHealth;
+                maxHealth = hardHealth;
+                break;
+        }
         UpdateHPBar();
     }
 
-    // Call this method in LateUpdate to update the HP bar's position
-    private void LateUpdate()
-    {
-
-        Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
-        Vector3 hpBarPos = screenPos + new Vector3(0f, 100f, 0f);
-
-        // Calculate distance between the opponent and the player
-        float distance = Vector3.Distance(transform.position, Camera.main.transform.position);
-
-        if (distance < maxRenderDistance)
-        {
-            // Opponent is within the rendering distance, show the HP bar
-            hpBar.transform.position = hpBarPos;
-        }
-        else
-        {
-            // Opponent is beyond the rendering distance, disable HP bar rendering
-            hpBar.transform.position = new Vector3(-1000f, -1000f, 0f);
-        }
-    }
-
-    // Call this method to update the HP bar
     public void UpdateHPBar()
     {
         float hpPercentage = currentHealth / maxHealth;
-        hpBar.value = hpPercentage; // Set the value of the Slider to the HP percentage
+        hpBar.value = hpPercentage; 
     }
 
     public void Hit()
     {
-        currentHealth -= maxHealth / 4;
+
+        switch (GunsController.currentGun)
+        {
+            case GunsController.Guns.Pistol:
+                currentHealth -= GunsController.pistolDamage;
+                break;
+            case GunsController.Guns.PM:
+                currentHealth -= GunsController.pmDamage;
+                break;
+            case GunsController.Guns.M4:
+                currentHealth -= GunsController.m4Damage;
+                break;
+        }
+
+
         UpdateHPBar();
         if (currentHealth <= 0)
         {
+            foreach (var observer in observers)
+            {
+                observer.OnDestroy();
+            }
 
             Destroy(this.gameObject);
             Destroy(hpBar.gameObject);
         }
     }
 
+    public void AddObserver(IDestroyable obserwator)
+    {
+        observers.Add(obserwator);
+    }
+
+    public void RemoveObserver(IDestroyable obserwator)
+    {
+        observers.Remove(obserwator);
+    }
 }

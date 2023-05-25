@@ -7,6 +7,7 @@ TagManager:
   - soft
   - medium
   - hard
+  - SoundManager
   layers:
   - Default
   - TransparentFX

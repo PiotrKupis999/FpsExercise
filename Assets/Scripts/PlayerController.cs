@@ -5,28 +5,38 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     
+    private CharacterController characterController;
+    private Camera playerCamera;
 
     public float movementSpeed = 5f;
     public float mouseSensitivity = 2f;
     private float gravity = 1000f;
 
-    private CharacterController characterController;
-    private Camera playerCamera;
     private float verticalRotation = 0f;
     private Vector3 moveDirection;
+
     private Ray ray;
-    public ParticleController particleController;
+
+    public ParticleSystem particle;
+
+    public GameObject gunImage;    
+    private Animator animGun;
+
+    public GameObject flameImage;
+    private Animator animFlame;
+
+    private SoundManagerScript SoundManager;
 
 
     void Start()
     {
         characterController = GetComponent<CharacterController>();
         playerCamera = GetComponentInChildren<Camera>();
-        particleController = GetComponent<ParticleController>();
 
+        animGun = gunImage.GetComponent<Animator>();
+        animFlame = flameImage.GetComponent<Animator>();
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        SoundManager = GameObject.FindGameObjectWithTag("SoundManager").GetComponent<SoundManagerScript>();
 
         ray = new Ray(transform.position, Vector3.forward);
     }
@@ -43,7 +53,6 @@ public class PlayerController : MonoBehaviour
 
         moveDirection.y -= gravity * Time.deltaTime;
 
-        // Apply movement
         characterController.Move(moveDirection * Time.deltaTime);
 
         // Player rotation
@@ -63,12 +72,63 @@ public class PlayerController : MonoBehaviour
 
 
         // Shooting
-        if (Input.GetButtonDown("Fire1"))
+
+        switch (GunsController.currentGun)
         {
-            Shoot();
+            case GunsController.Guns.Pistol:
+                if (Input.GetButtonDown("Fire1"))
+                {
+
+                    if (!animGun.GetCurrentAnimatorStateInfo(0).IsName("Shooting"))
+                    {
+                        SoundManager.PlaySound(SoundManagerScript.Sounds.pistolSound);
+                        Shoot();
+
+                    }
+                }
+                break;
+            case GunsController.Guns.PM:
+                if (Input.GetButton("Fire1"))
+                {
+
+                    if (!animGun.GetCurrentAnimatorStateInfo(0).IsName("Shooting"))
+                    {
+                        SoundManager.PlaySound(SoundManagerScript.Sounds.pmSound);
+
+                        Shoot();
+
+                    }
+                }
+                break;
+            case GunsController.Guns.M4:
+                if (Input.GetButton("Fire1"))
+                {
+
+                    if (!animGun.GetCurrentAnimatorStateInfo(0).IsName("Shooting"))
+                    {
+                        SoundManager.PlaySound(SoundManagerScript.Sounds.m4Sound);
+
+                        Shoot();
+
+                    }
+                }
+                break;
+
         }
 
-        
+    }
+
+    private void LateUpdate()
+    {
+        if(moveDirection.x != 0)
+        {
+            animGun.SetBool("Walking", true);
+        }
+        else
+        {
+            animGun.SetBool("Walking", false);
+        }
+
 
     }
 
@@ -76,9 +136,14 @@ public class PlayerController : MonoBehaviour
     {
         RaycastHit hit;
 
+        animGun.SetTrigger("Shooting");
+        animFlame.SetTrigger("Flame");
 
+        if (Physics.Raycast(ray, out hit))
+        {
+            Instantiate(particle, hit.point, Quaternion.identity);
 
-
+        }
 
         switch (GunsController.currentGun)
         {
@@ -89,13 +154,11 @@ public class PlayerController : MonoBehaviour
                     if (opponent != null)
                     {
                         opponent.Hit();
-                        //particleController.StartParticleSystem(hit.point);
-
                     }
                 }
                 break;
             case GunsController.Guns.PM:
-                if (Physics.Raycast(ray, out hit) && (hit.collider.gameObject.tag == "medium"))
+                if (Physics.Raycast(ray, out hit) && ((hit.collider.gameObject.tag == "soft") || (hit.collider.gameObject.tag == "medium")))
                 {
                     OpponentController opponent = hit.collider.gameObject.GetComponent<OpponentController>();
                     if (opponent != null)
@@ -105,7 +168,7 @@ public class PlayerController : MonoBehaviour
                 }
                 break;
             case GunsController.Guns.M4:
-                if (Physics.Raycast(ray, out hit) && (hit.collider.gameObject.tag == "hard"))
+                if (Physics.Raycast(ray, out hit))
                 {
                     OpponentController opponent = hit.collider.gameObject.GetComponent<OpponentController>();
                     if (opponent != null)
@@ -119,6 +182,5 @@ public class PlayerController : MonoBehaviour
         }
 
 
-        Debug.Log("Shoot!");
     }
 }
