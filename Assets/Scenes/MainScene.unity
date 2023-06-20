@@ -472,7 +472,7 @@ MonoBehaviour:
     oraz zielony sze\u015Bcian\n\nKarabin maszynowy - \"3\" nad QWERTY - obra\u017Cenia
     60hp - strza\u0142y automatyczne -\n mo\u017Ce zniszczy\u0107 wszystko\n\n\n\nOpis
     przedmiot\xF3w:\n\nZielony sze\u015Bcian - 100hp\n\n\u017B\xF3\u0142ta beczka
-    - 300hp\n\nCzerwona kolumna - 500hp\n\n\n(kliknij na baner, by go zamkn\u0105\u0107)"
+    - 300hp\n\nCzerwona kolumna - 500hp\n\n\n(kliknij na baner, aby go zamkn\u0105\u0107)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
